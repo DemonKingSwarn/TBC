@@ -17,10 +17,13 @@ public class ThirdPersonMovement : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
     [SerializeField] LayerMask groundMask;
+    
+    [SerializeField] LayerMask aimColliderMask;
+    [SerializeField] Transform debugTransform;
 
     Vector3 velocity;
     bool isGrounded;
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -53,7 +56,30 @@ public class ThirdPersonMovement : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-
+           
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        Transform hitTransform = null;
+        if(Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderMask)) 
+        {
+            debugTransform.position = raycastHit.point;
+            hitTransform = raycastHit.transform;
+        }
+        
+        if(Input.GetButtonDown("Fire1")) 
+        {
+            if(hitTransform != null) 
+            {
+                if(hitTransform.GetComponent<BulletTarget>() != null) 
+                {
+                    //Instantiate(vfxHitGreen, transform.position, Quaternion.identity);
+                    Debug.Log("vfx green");
+                } else {
+                    //Instantiate(vfxHitRed, transform.position, Quaternion.identity);
+                    Debug.Log("vfx red");
+                }
+            }
+        }    
     }
         
 }
